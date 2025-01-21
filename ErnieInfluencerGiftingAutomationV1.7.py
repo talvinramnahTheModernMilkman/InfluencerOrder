@@ -6,6 +6,8 @@ from datetime import datetime, timedelta
 from google.oauth2.service_account import Credentials
 import gspread
 
+st.set_page_config(page_title="Influencer Order Automation", page_icon=":rocket:", layout="wide")
+
 # Authenticate with Google Sheets
 def authenticate_google_sheets():
     try:
