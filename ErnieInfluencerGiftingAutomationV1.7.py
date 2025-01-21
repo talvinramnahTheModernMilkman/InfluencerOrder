@@ -3,13 +3,12 @@ import gspread
 from google.oauth2 import service_account
 import pandas as pd
 from datetime import datetime, timedelta
-import copy
 
 # Authenticate with Google Sheets
 def authenticate_google_sheets():
     try:
         # Load credentials from Streamlit secrets
-        creds_dict = copy.deepcopy(st.secrets["google_service_account"])  # Make a copy of the secrets
+        creds_dict = dict(st.secrets["google_service_account"])  # Explicitly convert to a mutable dictionary
         creds_dict["private_key"] = creds_dict["private_key"].replace("\\n", "\n")  # Ensure proper formatting
 
         # Authenticate with the credentials
@@ -39,7 +38,7 @@ phone_number = st.text_input("Enter Phone Number:")
 bundle_type = st.selectbox("Select Bundle", ["vegan", "non-vegan"])
 
 if postcode:
-    matched_row = postcode_data[postcode_data["Postcode"] == postcode.upper()]
+    matched_row = postcode_data[postcode_data["Postcode"] == postcode]
     if not matched_row.empty:
         sched = matched_row.iloc[0]["Sched"]
         st.success(f"Delivery schedule for {postcode}: {sched}")
