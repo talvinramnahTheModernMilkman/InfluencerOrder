@@ -9,8 +9,8 @@ import gspread
 # Authenticate with Google Sheets
 def authenticate_google_sheets():
     try:
-        # Load credentials from Streamlit secrets
-        creds_dict = st.secrets["google_service_account"]
+        # Create a copy of the secrets to avoid modifying st.secrets directly
+        creds_dict = dict(st.secrets["google_service_account"])
         creds_dict["private_key"] = creds_dict["private_key"].replace("\\n", "\n")  # Ensure proper formatting
 
         # Authenticate with Google Sheets API
