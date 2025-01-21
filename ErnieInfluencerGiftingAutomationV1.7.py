@@ -89,6 +89,6 @@ if st.button("Submit"):
 
             # Append data to Google Sheets
             worksheet.append_row(data)
-            st.success("Data saved to Google Sheets successfully!")
+            st.success("Order Gifted to Account")
         except Exception as e:
-            st.error(f"Failed to save data to Google Sheets. Error: {e}")
+            st.error(f"Failed to gift order. Error: {e}")
