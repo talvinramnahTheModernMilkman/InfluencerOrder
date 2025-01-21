@@ -37,7 +37,7 @@ st.title("Influencer Order Automation")
 
 # User inputs
 email = st.text_input("Enter Email:")
-username = st.text_input("Enter Username:")
+username = st.text_input("Enter Instagram Username:")
 postcode = st.text_input("Enter Postcode:").upper().replace(" ", "")  # Format postcode
 phone_number = st.text_input("Enter Phone Number:")
 bundle_type = st.selectbox("Select Bundle", ["vegan", "non-vegan"])
