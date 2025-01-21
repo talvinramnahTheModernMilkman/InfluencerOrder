@@ -3,16 +3,21 @@ import gspread
 from google.oauth2 import service_account
 import pandas as pd
 from datetime import datetime, timedelta
+from google.oauth2.service_account import Credentials
+import gspread
 
 # Authenticate with Google Sheets
 def authenticate_google_sheets():
     try:
         # Load credentials from Streamlit secrets
-        creds_dict = dict(st.secrets["google_service_account"])  # Explicitly convert to a mutable dictionary
+        creds_dict = st.secrets["google_service_account"]
         creds_dict["private_key"] = creds_dict["private_key"].replace("\\n", "\n")  # Ensure proper formatting
 
-        # Authenticate with the credentials
-        credentials = service_account.Credentials.from_service_account_info(creds_dict)
+        # Authenticate with Google Sheets API
+        credentials = Credentials.from_service_account_info(
+            creds_dict,
+            scopes=["https://www.googleapis.com/auth/spreadsheets"]
+        )
         client = gspread.authorize(credentials)
         return client
     except Exception as e:
