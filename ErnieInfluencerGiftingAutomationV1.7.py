@@ -27,10 +27,12 @@ def append_to_google_sheet(data):
         st.error(f"Failed to save data to Google Sheets. Error: {e}")
 
 # Cache the postcode data for performance
-@st.cache
+# Load the delivery schedule CSV
+@st.cache_data
 def load_postcode_data():
     url = "https://raw.githubusercontent.com/talvinramnahTheModernMilkman/InfluencerPortal/refs/heads/main/active%20postcodes%20with%20delivery%20sched.csv"
     return pd.read_csv(url)
+
 
 postcode_data = load_postcode_data()
 
