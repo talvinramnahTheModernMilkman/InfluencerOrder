@@ -1,31 +1,22 @@
 import streamlit as st
 import gspread
-from google.oauth2.service_account import Credentials
+from google.oauth2 import service_account
 import pandas as pd
 from datetime import datetime, timedelta
 
 # Authenticate with Google Sheets
-def get_gspread_client():
+def authenticate_google_sheets():
     try:
-        credentials = Credentials.from_service_account_info(
-            st.secrets["google_service_account"],
-            scopes=["https://www.googleapis.com/auth/spreadsheets"]
-        )
-        return gspread.authorize(credentials)
+        # Load credentials from Streamlit secrets
+        creds_dict = st.secrets["google_service_account"]
+        creds_dict["private_key"] = creds_dict["private_key"].replace("\\n", "\n")  # Ensure proper formatting
+
+        # Authenticate with the credentials
+        credentials = service_account.Credentials.from_service_account_info(creds_dict)
+        client = gspread.authorize(credentials)
+        return client
     except Exception as e:
         st.error(f"Failed to authenticate with Google Sheets. Error: {e}")
-        raise
-
-# Append data to Google Sheets
-def append_to_google_sheet(data):
-    try:
-        client = get_gspread_client()
-        sheet = client.open_by_key("1bVXh9cRk1rx3cqbx7V8vOq4WIuQ8yVP439lsZ535RXs")
-        worksheet = sheet.get_worksheet(0)  # First sheet
-        worksheet.append_row(data)
-        st.success("Data saved to Google Sheets successfully!")
-    except Exception as e:
-        st.error(f"Failed to save data to Google Sheets. Error: {e}")
         raise
 
 # Load the delivery schedule CSV
@@ -47,7 +38,7 @@ phone_number = st.text_input("Enter Phone Number:")
 bundle_type = st.selectbox("Select Bundle", ["vegan", "non-vegan"])
 
 if postcode:
-    matched_row = postcode_data[postcode_data["Postcode"] == postcode]
+    matched_row = postcode_data[postcode_data["Postcode"] == postcode.upper()]
     if not matched_row.empty:
         sched = matched_row.iloc[0]["Sched"]
         st.success(f"Delivery schedule for {postcode}: {sched}")
@@ -82,11 +73,17 @@ if st.button("Submit"):
         st.error("Please complete all fields before submitting.")
     else:
         try:
+            # Authenticate and access Google Sheets
+            client = authenticate_google_sheets()
+            sheet = client.open_by_url("https://docs.google.com/spreadsheets/d/1bVXh9cRk1rx3cqbx7V8vOq4WIuQ8yVP439lsZ535RXs/edit#gid=0")
+            worksheet = sheet.sheet1
+
             # Format data
             formatted_date = start_date.strftime("%d/%m/%Y")
             data = [email, username, postcode, phone_number, bundle_type, formatted_date]
 
             # Append data to Google Sheets
-            append_to_google_sheet(data)
+            worksheet.append_row(data)
+            st.success("Data saved to Google Sheets successfully!")
         except Exception as e:
             st.error(f"Failed to save data to Google Sheets. Error: {e}")
